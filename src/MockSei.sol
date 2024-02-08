@@ -24,12 +24,12 @@ contract MockSei is ERC20, ReentrancyGuard {
         _;
     }
 
-    function addClaimable(address user, uint256 amount, string memory txHash) external onlyOwner {
+    function addClaimable(address to, uint256 amount, string memory txHash) external onlyOwner {
         if (txHashUsed[txHash]) {
             revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
         }
-        claimable[user] += amount;
         txHashUsed[txHash] = true;
+        claimable[to] += amount;
     }
 
     function claim() external nonReentrant {
@@ -39,5 +39,13 @@ contract MockSei is ERC20, ReentrancyGuard {
         uint256 unclaimed = claimable[msg.sender] - claimed[msg.sender];
         claimed[msg.sender] = claimable[msg.sender];
         _mint(msg.sender, unclaimed);
+    }
+
+    function mint(address to, uint256 amount, string memory txHash) external onlyOwner {
+        if (txHashUsed[txHash]) {
+            revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
+        }
+        txHashUsed[txHash] = true;
+        _mint(to, amount);
     }
 }

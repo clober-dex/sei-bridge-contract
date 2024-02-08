@@ -14,7 +14,8 @@ contract MockSeiTest is Test {
         mockSei = new MockSei();
     }
 
-    function testFuzz_AddClaimable(address user) public {
+    function testFuzz_AddClaimable(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
         uint256 amount = 101 * PRECISION;
         string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
 
@@ -26,7 +27,8 @@ contract MockSeiTest is Test {
         assertEq(mockSei.claimable(user), amount);
     }
 
-    function testFuzz_IncreaseClaimable(address user) public {
+    function testFuzz_IncreaseClaimable(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
         uint256 amount1 = 42 * PRECISION;
         uint256 amount2 = 69 * PRECISION;
 
@@ -45,7 +47,8 @@ contract MockSeiTest is Test {
         assertEq(mockSei.claimable(user), amount1 + amount2);
     }
 
-    function testFuzz_IncreaseClaimableUsingSameTxHash(address user) public {
+    function testFuzz_IncreaseClaimableUsingSameTxHash(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
         uint256 amount1 = 42 * PRECISION;
         uint256 amount2 = 69 * PRECISION;
 
@@ -131,5 +134,36 @@ contract MockSeiTest is Test {
         // check claimed & balance
         assertEq(mockSei.claimed(user), amount1 + amount2);
         assertEq(mockSei.balanceOf(user), amount1 + amount2);
+    }
+
+    function testFuzz_mint(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
+        uint256 amount = 101 * PRECISION;
+        string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
+
+        // before mint
+        assertEq(mockSei.claimable(user), 0);
+        assertEq(mockSei.claimed(user), 0);
+        assertEq(mockSei.balanceOf(user), 0);
+        // mint
+        mockSei.mint(user, amount, txHash);
+        // after mint
+        assertEq(mockSei.claimable(user), 0);
+        assertEq(mockSei.claimed(user), 0);
+        assertEq(mockSei.balanceOf(user), amount);
+    }
+
+    function testFuzz_MintUsingSameTxHash(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
+        uint256 amount1 = 42 * PRECISION;
+        uint256 amount2 = 69 * PRECISION;
+
+        string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
+
+        // mint
+        mockSei.mint(user, amount1, txHash);
+        // mint using same txHash
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeiFaucetError.selector, Errors.TX_HASH_USED));
+        mockSei.mint(user, amount2, txHash);
     }
 }
