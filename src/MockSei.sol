@@ -11,6 +11,7 @@ contract MockSei is ERC20, ReentrancyGuard {
 
     mapping(address => uint256) public claimable;
     mapping(address => uint256) public claimed;
+    mapping(string => bool) public txHashUsed;
 
     constructor() ERC20("Mock Sei", "mSei") {
         owner = msg.sender;
@@ -23,8 +24,12 @@ contract MockSei is ERC20, ReentrancyGuard {
         _;
     }
 
-    function addClaimable(address user, uint256 amount) external onlyOwner {
+    function addClaimable(address user, uint256 amount, string memory txHash) external onlyOwner {
+        if (txHashUsed[txHash]) {
+            revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
+        }
         claimable[user] += amount;
+        txHashUsed[txHash] = true;
     }
 
     function claim() external nonReentrant {
