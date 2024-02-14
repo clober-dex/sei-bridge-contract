@@ -7,6 +7,7 @@ import {Errors} from "../src/Errors.sol";
 
 contract MockSeiTest is Test {
     uint256 public constant PRECISION = 10**18;
+    uint8 public constant DECIMALS = 6;
 
     MockSei public mockSei;
 
@@ -14,6 +15,10 @@ contract MockSeiTest is Test {
 
     function setUp() public {
         mockSei = new MockSei();
+    }
+
+    function test_Decimals() public {
+        assertEq(mockSei.decimals(), DECIMALS);
     }
 
     function testFuzz_mint(uint16 seed) public {

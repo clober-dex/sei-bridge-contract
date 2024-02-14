@@ -17,6 +17,10 @@ contract MockSei is ERC20, ReentrancyGuard {
         owner = msg.sender;
     }
 
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
+    }
+
     modifier onlyOwner() {
         if (msg.sender != owner) {
             revert Errors.SeiFaucetError(Errors.UNAUTHORIZED);
