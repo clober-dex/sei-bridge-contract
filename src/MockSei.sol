@@ -9,9 +9,9 @@ import "./ReentrancyGuard.sol";
 contract MockSei is ERC20, ReentrancyGuard {
     address public immutable owner;
 
-    mapping(address => uint256) public claimable;
-    mapping(address => uint256) public claimed;
     mapping(string => bool) public txHashUsed;
+
+    event Mint(address indexed to, uint256 amount, string txHash);
 
     constructor() ERC20("Mock Sei", "mSei") {
         owner = msg.sender;
@@ -24,28 +24,12 @@ contract MockSei is ERC20, ReentrancyGuard {
         _;
     }
 
-    function addClaimable(address to, uint256 amount, string memory txHash) external onlyOwner {
-        if (txHashUsed[txHash]) {
-            revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
-        }
-        txHashUsed[txHash] = true;
-        claimable[to] += amount;
-    }
-
-    function claim() external nonReentrant {
-        if (claimable[msg.sender] <= claimed[msg.sender]) {
-            revert Errors.SeiFaucetError(Errors.INSUFFICIENT_CLAIMABLE);
-        }
-        uint256 unclaimed = claimable[msg.sender] - claimed[msg.sender];
-        claimed[msg.sender] = claimable[msg.sender];
-        _mint(msg.sender, unclaimed);
-    }
-
     function mint(address to, uint256 amount, string memory txHash) external onlyOwner {
         if (txHashUsed[txHash]) {
             revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
         }
         txHashUsed[txHash] = true;
         _mint(to, amount);
+        emit Mint(to, amount, txHash);
     }
 }
