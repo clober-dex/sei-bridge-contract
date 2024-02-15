@@ -3,39 +3,31 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "./Errors.sol";
-import "./ReentrancyGuard.sol";
+import "./Pausable.sol";
 
-contract MockSei is ERC20, ReentrancyGuard {
-    address public immutable owner;
-
+contract Berry is ERC20, Pausable {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
 
     event Mint(address indexed to, uint256 amount, string txHash);
 
-    constructor() ERC20("Mock Sei", "mSei") {
-        owner = msg.sender;
-    }
+    constructor() ERC20("Seirum Berry Coin", "BERRY") Ownable(msg.sender) {}
 
     function decimals() public view virtual override returns (uint8) {
         return 6;
     }
 
-    modifier onlyOwner() {
-        if (msg.sender != owner) {
-            revert Errors.SeiFaucetError(Errors.UNAUTHORIZED);
-        }
-        _;
-    }
-
-    function mint(address to, uint256 amount, string memory txHash) external onlyOwner {
+    function mint(address to, uint256 amount, string memory txHash) external onlyOwner whenNotPaused {
         if (txHashUsed[txHash]) {
-            revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
+            revert Errors.SeirumError(Errors.TX_HASH_USED);
         }
         txHashUsed[txHash] = true;
         depositAmount[to] += amount;
         _mint(to, amount);
         emit Mint(to, amount, txHash);
+    }
+
+    function adminMint(uint256 amount) external onlyOwner whenNotPaused {
+        _mint(owner(), amount);
     }
 }
