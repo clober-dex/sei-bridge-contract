@@ -35,6 +35,7 @@ contract MockSeiTest is Test {
         mockSei.mint(user, amount, txHash);
         // after mint
         assertEq(mockSei.balanceOf(user), amount);
+        assertEq(mockSei.depositAmount(user), amount);
     }
 
     function testFuzz_MintUsingSameTxHash(uint16 seed) public {

@@ -10,6 +10,7 @@ contract MockSei is ERC20, ReentrancyGuard {
     address public immutable owner;
 
     mapping(string => bool) public txHashUsed;
+    mapping(address => uint256) public depositAmount;
 
     event Mint(address indexed to, uint256 amount, string txHash);
 
@@ -33,6 +34,7 @@ contract MockSei is ERC20, ReentrancyGuard {
             revert Errors.SeiFaucetError(Errors.TX_HASH_USED);
         }
         txHashUsed[txHash] = true;
+        depositAmount[to] += amount;
         _mint(to, amount);
         emit Mint(to, amount, txHash);
     }
