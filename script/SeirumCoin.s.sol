@@ -4,14 +4,17 @@ pragma solidity ^0.8.13;
 import {Script, console} from "forge-std/Script.sol";
 
 import {Berry} from "../src/Berry.sol";
+import {Buck} from "../src/Buck.sol";
 
-contract MockSeiScript is Script {
+contract SeirumCoinDeployScript is Script {
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
-        Berry mockSei = new Berry();
-        console.log(address(mockSei));
+        Berry berry = new Berry();
+        Buck buck = new Buck();
+        console.log(address(berry));
+        console.log(address(buck));
         vm.stopBroadcast();
     }
 }
