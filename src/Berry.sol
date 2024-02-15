@@ -2,10 +2,11 @@
 pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
-import "./Pausable.sol";
+import "./Errors.sol";
 
-contract Berry is ERC20, Pausable {
+contract Berry is ERC20, Ownable2Step {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
 
@@ -17,7 +18,7 @@ contract Berry is ERC20, Pausable {
         return 6;
     }
 
-    function mint(address to, uint256 amount, string memory txHash) external onlyOwner whenNotPaused {
+    function mint(address to, uint256 amount, string memory txHash) external onlyOwner {
         if (txHashUsed[txHash]) {
             revert Errors.SeirumError(Errors.TX_HASH_USED);
         }
@@ -27,7 +28,7 @@ contract Berry is ERC20, Pausable {
         emit Mint(to, amount, txHash);
     }
 
-    function adminMint(uint256 amount) external onlyOwner whenNotPaused {
+    function adminMint(uint256 amount) external onlyOwner {
         _mint(owner(), amount);
     }
 }

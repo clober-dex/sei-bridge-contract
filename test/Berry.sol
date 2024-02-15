@@ -64,17 +64,7 @@ contract BerryTest is Test {
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
         berry.adminMint(100 * PRECISION);
 
-        vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
-        berry.pause();
         vm.stopPrank();
-    }
-
-    function testFuzz_pause(uint16 seed) public {
-        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
-
-        berry.pause();
-        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.PAUSED));
-        berry.mint(user, 100 * PRECISION, "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C");
     }
 
     function test_adminMint() public {
