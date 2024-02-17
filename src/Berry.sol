@@ -9,8 +9,9 @@ import "./Errors.sol";
 contract Berry is ERC20, Ownable2Step {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
+    mapping(address => string) public accountOwner;
 
-    event Mint(address indexed to, uint256 amount, string txHash);
+    event Mint(address indexed to, uint256 amount, string txHash, string from);
 
     constructor() ERC20("Seirum Berry Coin", "BERRY") Ownable(msg.sender) {}
 
@@ -18,14 +19,18 @@ contract Berry is ERC20, Ownable2Step {
         return 6;
     }
 
-    function mint(address to, uint256 amount, string memory txHash) external onlyOwner {
+    function mint(address to, uint256 amount, string memory txHash, string memory from) external onlyOwner {
         if (txHashUsed[txHash]) {
             revert Errors.SeirumError(Errors.TX_HASH_USED);
         }
+        if (bytes(accountOwner[to]).length != 0 && keccak256(abi.encodePacked(accountOwner[to])) != keccak256(abi.encodePacked(from))) {
+            revert Errors.SeirumError(Errors.ACCOUNT_OWNER_NOT_MATCH);
+        }
         txHashUsed[txHash] = true;
+        accountOwner[to] = from;
         depositAmount[to] += amount;
         _mint(to, amount);
-        emit Mint(to, amount, txHash);
+        emit Mint(to, amount, txHash, from);
     }
 
     function adminMint(uint256 amount) external onlyOwner {
