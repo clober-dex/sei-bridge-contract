@@ -20,6 +20,10 @@ contract Berry is ERC20, Ownable2Step {
     }
 
     function mint(address to, uint256 amount, string memory txHash, string memory from) external onlyOwner {
+        // check to, amount, txHash, from is not empty
+        if (to == address(0) || amount == 0 || bytes(txHash).length == 0 || bytes(from).length == 0) {
+            revert Errors.SeirumError(Errors.INVALID_INPUT);
+        }
         if (txHashUsed[txHash]) {
             revert Errors.SeirumError(Errors.TX_HASH_USED);
         }

@@ -64,6 +64,59 @@ contract BerryTest is Test {
         assertEq(berry.depositAmount(user), amount * 2);
     }
 
+    function testFuzz_mintWithZeroAmount(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
+        uint256 amount = 0;
+        string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
+
+        // before mint
+        assertEq(berry.balanceOf(user), 0);
+        // expect revert
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
+        // mint
+        berry.mint(user, amount, txHash, COSMOS_ADDRESS);
+    }
+
+    function test_mintWithEmptyUser() public {
+        address user = address(0);
+        uint256 amount = 101 * PRECISION;
+        string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
+
+        // before mint
+        assertEq(berry.balanceOf(user), 0);
+        // expect revert
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
+        // mint
+        berry.mint(user, amount, txHash, COSMOS_ADDRESS);
+    }
+
+    function testFuzz_mintWithEmptyTxHash(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
+        uint256 amount = 101 * PRECISION;
+        string memory txHash = "";
+
+        // before mint
+        assertEq(berry.balanceOf(user), 0);
+        // expect revert
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
+        // mint
+        berry.mint(user, amount, txHash, COSMOS_ADDRESS);
+    }
+
+    function testFuzz_mintWithEmptyFrom(uint16 seed) public {
+        address user = address(bytes20(keccak256(abi.encodePacked(seed))));
+        uint256 amount = 101 * PRECISION;
+        string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
+        string memory from = "";
+
+        // before mint
+        assertEq(berry.balanceOf(user), 0);
+        // expect revert
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
+        // mint
+        berry.mint(user, amount, txHash, from);
+    }
+
     function testFuzz_mintTwiceWithDifferentOwner(uint16 seed) public {
         address user = address(bytes20(keccak256(abi.encodePacked(seed))));
         string memory cosmosAddress1 = "sei1jtaud9fjknryvw9y8yqvc9sqcn0g6shl5fkatn";
