@@ -2,27 +2,27 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Berry} from "../src/Berry.sol";
+import {Beri} from "../src/Beri.sol";
 import {Errors} from "../src/Errors.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract BerryTest is Test {
+contract BeriTest is Test {
     uint256 public constant PRECISION = 10**18;
     uint8 public constant DECIMALS = 6;
     string public constant COSMOS_ADDRESS = "sei1jtaud9fjknryvw9y8yqvc9sqcn0g6shl5fkatn";
     string public constant SEI_PRICE = "0.9123";
 
-    Berry public berry;
+    Beri public beri;
 
     event Mint(address indexed to, uint256 amount, string txHash, string from, string price);
 
     function setUp() public {
-        berry = new Berry();
+        beri = new Beri();
     }
 
     function test_Decimals() public {
-        assertEq(berry.decimals(), DECIMALS);
+        assertEq(beri.decimals(), DECIMALS);
     }
 
     function testFuzz_mint(uint16 seed) public {
@@ -31,15 +31,15 @@ contract BerryTest is Test {
         string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect mint event
         vm.expectEmit();
         emit Mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
         // mint
-        berry.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
         // after mint
-        assertEq(berry.balanceOf(user), amount);
-        assertEq(berry.depositAmount(user), amount);
+        assertEq(beri.balanceOf(user), amount);
+        assertEq(beri.depositAmount(user), amount);
     }
 
     function testFuzz_mintTwice(uint16 seed) public {
@@ -49,20 +49,20 @@ contract BerryTest is Test {
         string memory txHash2 = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46D";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect mint event
         vm.expectEmit();
         emit Mint(user, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
         // mint
-        berry.mint(user, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
         // expect mint event
         vm.expectEmit();
         emit Mint(user, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
         // and again
-        berry.mint(user, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
         // after mint
-        assertEq(berry.balanceOf(user), amount * 2);
-        assertEq(berry.depositAmount(user), amount * 2);
+        assertEq(beri.balanceOf(user), amount * 2);
+        assertEq(beri.depositAmount(user), amount * 2);
     }
 
     function testFuzz_mintWithZeroAmount(uint16 seed) public {
@@ -71,11 +71,11 @@ contract BerryTest is Test {
         string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
         // mint
-        berry.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
     }
 
     function test_mintWithEmptyUser() public {
@@ -84,11 +84,11 @@ contract BerryTest is Test {
         string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
         // mint
-        berry.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
     }
 
     function testFuzz_mintWithEmptyTxHash(uint16 seed) public {
@@ -97,11 +97,11 @@ contract BerryTest is Test {
         string memory txHash = "";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
         // mint
-        berry.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount, txHash, COSMOS_ADDRESS, SEI_PRICE);
     }
 
     function testFuzz_mintWithEmptyFrom(uint16 seed) public {
@@ -111,11 +111,11 @@ contract BerryTest is Test {
         string memory from = "";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.INVALID_INPUT));
         // mint
-        berry.mint(user, amount, txHash, from, SEI_PRICE);
+        beri.mint(user, amount, txHash, from, SEI_PRICE);
     }
 
     function testFuzz_mintTwiceWithDifferentOwner(uint16 seed) public {
@@ -128,16 +128,16 @@ contract BerryTest is Test {
         string memory txHash2 = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46D";
 
         // before mint
-        assertEq(berry.balanceOf(user), 0);
+        assertEq(beri.balanceOf(user), 0);
         // expect mint event
         vm.expectEmit();
         emit Mint(user, amount, txHash1, cosmosAddress1, SEI_PRICE);
         // mint
-        berry.mint(user, amount, txHash1, cosmosAddress1, SEI_PRICE);
+        beri.mint(user, amount, txHash1, cosmosAddress1, SEI_PRICE);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH));
         // and again
-        berry.mint(user, amount, txHash2, cosmosAddress2, SEI_PRICE);
+        beri.mint(user, amount, txHash2, cosmosAddress2, SEI_PRICE);
     }
 
     function test_mintTwiceWithDifferentAddress() public {
@@ -151,18 +151,18 @@ contract BerryTest is Test {
         string memory txHash2 = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46D";
 
         // before mint
-        assertEq(berry.balanceOf(user1), 0);
+        assertEq(beri.balanceOf(user1), 0);
         // expect mint event
         vm.expectEmit();
         emit Mint(user1, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
         // mint
-        berry.mint(user1, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user1, amount, txHash1, COSMOS_ADDRESS, SEI_PRICE);
         // after mint
-        assertEq(berry.balanceOf(user1), amount);
+        assertEq(beri.balanceOf(user1), amount);
         // expect revert
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH));
         // and again
-        berry.mint(user2, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user2, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
     }
 
     function testFuzz_MintUsingSameTxHash(uint16 seed) public {
@@ -173,10 +173,10 @@ contract BerryTest is Test {
         string memory txHash = "02C33440F07451D69A6B1399E290F24FF7006F4CC047D25CA7CEDAFA8797C46C";
 
         // mint
-        berry.mint(user, amount1, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount1, txHash, COSMOS_ADDRESS, SEI_PRICE);
         // mint using same txHash
         vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.TX_HASH_USED));
-        berry.mint(user, amount2, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, amount2, txHash, COSMOS_ADDRESS, SEI_PRICE);
     }
 
     function testFuzz_roleCheck(uint16 seed) public {
@@ -185,10 +185,10 @@ contract BerryTest is Test {
 
         vm.startPrank(user);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
-        berry.mint(user, 100 * PRECISION, txHash, COSMOS_ADDRESS, SEI_PRICE);
+        beri.mint(user, 100 * PRECISION, txHash, COSMOS_ADDRESS, SEI_PRICE);
 
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, user));
-        berry.adminMint(100 * PRECISION);
+        beri.adminMint(100 * PRECISION);
 
         vm.stopPrank();
     }
@@ -197,10 +197,10 @@ contract BerryTest is Test {
         uint256 amount = 100 * PRECISION;
 
         // before mint
-        assertEq(berry.balanceOf(address(this)), 0);
+        assertEq(beri.balanceOf(address(this)), 0);
         // mint
-        berry.adminMint(amount);
+        beri.adminMint(amount);
         // after mint
-        assertEq(berry.balanceOf(address(this)), amount);
+        assertEq(beri.balanceOf(address(this)), amount);
     }
 }

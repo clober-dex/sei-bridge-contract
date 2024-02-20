@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 import "./Errors.sol";
 
-contract Berry is ERC20, Ownable2Step {
+contract Beri is ERC20, Ownable2Step {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
     mapping(address => string) public cosmosAddressMap;
@@ -14,7 +14,7 @@ contract Berry is ERC20, Ownable2Step {
 
     event Mint(address indexed to, uint256 amount, string txHash, string from, string price);
 
-    constructor() ERC20("Seirum Berry Coin", "BERRY") Ownable(msg.sender) {}
+    constructor() ERC20("Seirum Beri Coin", "BERI") Ownable(msg.sender) {}
 
     function decimals() public view virtual override returns (uint8) {
         return 6;
