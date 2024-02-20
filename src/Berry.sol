@@ -10,8 +10,9 @@ contract Berry is ERC20, Ownable2Step {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
     mapping(address => string) public accountOwner;
+    mapping(string => address) public accountAddress;
 
-    event Mint(address indexed to, uint256 amount, string txHash, string from);
+    event Mint(address indexed to, uint256 amount, string txHash, string from, string price);
 
     constructor() ERC20("Seirum Berry Coin", "BERRY") Ownable(msg.sender) {}
 
@@ -19,9 +20,9 @@ contract Berry is ERC20, Ownable2Step {
         return 6;
     }
 
-    function mint(address to, uint256 amount, string memory txHash, string memory from) external onlyOwner {
-        // check to, amount, txHash, from is not empty
-        if (to == address(0) || amount == 0 || bytes(txHash).length == 0 || bytes(from).length == 0) {
+    function mint(address to, uint256 amount, string memory txHash, string memory from, string memory price) external onlyOwner {
+        // check to, amount, txHash, from, price is not empty
+        if (to == address(0) || amount == 0 || bytes(txHash).length == 0 || bytes(from).length == 0 || bytes(price).length == 0) {
             revert Errors.SeirumError(Errors.INVALID_INPUT);
         }
         if (txHashUsed[txHash]) {
@@ -30,11 +31,15 @@ contract Berry is ERC20, Ownable2Step {
         if (bytes(accountOwner[to]).length != 0 && keccak256(abi.encodePacked(accountOwner[to])) != keccak256(abi.encodePacked(from))) {
             revert Errors.SeirumError(Errors.ACCOUNT_OWNER_NOT_MATCH);
         }
+        if (accountAddress[from] != address(0) && accountAddress[from] != to) {
+            revert Errors.SeirumError(Errors.ACCOUNT_ADDRESS_NOT_MATCH);
+        }
         txHashUsed[txHash] = true;
         accountOwner[to] = from;
+        accountAddress[from] = to;
         depositAmount[to] += amount;
         _mint(to, amount);
-        emit Mint(to, amount, txHash, from);
+        emit Mint(to, amount, txHash, from, price);
     }
 
     function adminMint(uint256 amount) external onlyOwner {

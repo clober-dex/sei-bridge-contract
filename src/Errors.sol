@@ -9,5 +9,6 @@ library Errors {
     uint256 public constant TX_HASH_USED = 0;
     uint256 public constant PAUSED = 1;
     uint256 public constant ACCOUNT_OWNER_NOT_MATCH = 2;
-    uint256 public constant INVALID_INPUT = 3;
+    uint256 public constant ACCOUNT_ADDRESS_NOT_MATCH = 3;
+    uint256 public constant INVALID_INPUT = 4;
 }
