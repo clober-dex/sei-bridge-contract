@@ -135,7 +135,7 @@ contract BerryTest is Test {
         // mint
         berry.mint(user, amount, txHash1, cosmosAddress1, SEI_PRICE);
         // expect revert
-        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.ACCOUNT_OWNER_NOT_MATCH));
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH));
         // and again
         berry.mint(user, amount, txHash2, cosmosAddress2, SEI_PRICE);
     }
@@ -160,7 +160,7 @@ contract BerryTest is Test {
         // after mint
         assertEq(berry.balanceOf(user1), amount);
         // expect revert
-        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.ACCOUNT_ADDRESS_NOT_MATCH));
+        vm.expectRevert(abi.encodeWithSelector(Errors.SeirumError.selector, Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH));
         // and again
         berry.mint(user2, amount, txHash2, COSMOS_ADDRESS, SEI_PRICE);
     }

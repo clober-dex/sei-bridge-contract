@@ -9,8 +9,8 @@ import "./Errors.sol";
 contract Berry is ERC20, Ownable2Step {
     mapping(string => bool) public txHashUsed;
     mapping(address => uint256) public depositAmount;
-    mapping(address => string) public accountOwner;
-    mapping(string => address) public accountAddress;
+    mapping(address => string) public cosmosAddressMap;
+    mapping(string => address) public evmAddressMap;
 
     event Mint(address indexed to, uint256 amount, string txHash, string from, string price);
 
@@ -28,15 +28,15 @@ contract Berry is ERC20, Ownable2Step {
         if (txHashUsed[txHash]) {
             revert Errors.SeirumError(Errors.TX_HASH_USED);
         }
-        if (bytes(accountOwner[to]).length != 0 && keccak256(abi.encodePacked(accountOwner[to])) != keccak256(abi.encodePacked(from))) {
-            revert Errors.SeirumError(Errors.ACCOUNT_OWNER_NOT_MATCH);
+        if (bytes(cosmosAddressMap[to]).length != 0 && keccak256(abi.encodePacked(cosmosAddressMap[to])) != keccak256(abi.encodePacked(from))) {
+            revert Errors.SeirumError(Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH);
         }
-        if (accountAddress[from] != address(0) && accountAddress[from] != to) {
-            revert Errors.SeirumError(Errors.ACCOUNT_ADDRESS_NOT_MATCH);
+        if (evmAddressMap[from] != address(0) && evmAddressMap[from] != to) {
+            revert Errors.SeirumError(Errors.COSMOS_EVM_ADDRESSES_NOT_MATCH);
         }
         txHashUsed[txHash] = true;
-        accountOwner[to] = from;
-        accountAddress[from] = to;
+        cosmosAddressMap[to] = from;
+        evmAddressMap[from] = to;
         depositAmount[to] += amount;
         _mint(to, amount);
         emit Mint(to, amount, txHash, from, price);
