@@ -13,6 +13,7 @@ contract Beri is ERC20, Ownable2Step {
     mapping(string => address) public evmAddressMap;
 
     event Mint(address indexed to, uint256 amount, string txHash, string from, string price);
+    event AdminMint(uint256 amount);
 
     constructor() ERC20("Seirum Beri Coin", "BERI") Ownable(msg.sender) {}
 
@@ -44,5 +45,6 @@ contract Beri is ERC20, Ownable2Step {
 
     function adminMint(uint256 amount) external onlyOwner {
         _mint(owner(), amount);
+        emit AdminMint(amount);
     }
 }
